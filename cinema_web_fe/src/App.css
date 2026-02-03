@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --color-dark-bg: #101922;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-dark-bg);
+    color: rgba(255, 255, 255, 0.824);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.glass-overlay {
+  background: rgba(16, 25, 34, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* modal background */
+.modal-bg {
+  background-color: #192633;
+}
+
+/* ===== Scrollbar Dark Theme ===== */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a; /* màu nền (giống modal) */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #334155; /* thanh kéo */
+  border-radius: 999px;
+  border: 2px solid #0f172a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
