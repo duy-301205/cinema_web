@@ -18,6 +18,7 @@ import WriteReview from "./pages/WriteReview";
 import QrCode from "./components/QR_Code";
 import PaymentTicket from "./components/PaymentTicket";
 import BookingSuccess from "./pages/BookingSuccess";
+import FoodCinema from "./components/FoodCinema";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="/offers" element={<Offer />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/movie/:id/reviews" element={<ReviewMovie />} />
+          <Route path="/foodCinema" element={<FoodCinema />} />
         </Route>
       </Routes>
     </BrowserRouter>

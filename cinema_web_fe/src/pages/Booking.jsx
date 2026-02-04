@@ -9,26 +9,11 @@ import {
   Calendar,
   Clock,
   MapPin,
+  Utensils, // Thêm icon đồ ăn
 } from "lucide-react";
 
 export default function Booking() {
   const navigate = useNavigate();
-  const handlePurchase = () => {
-    const totalAmount = selectedSeats.length * seatPrice;
-
-    navigate("/payment", {
-      state: {
-        movieTitle: movie.title,
-        movieImage: movie.image, // Lấy link ảnh từ MOVIES_DATA
-        movieGenres: movie.genres,
-        date: selectedDate,
-        time: selectedTime,
-        seats: selectedSeats,
-        totalPrice: totalAmount,
-        cinemaName: "Grand Cinema - IMAX",
-      },
-    });
-  };
   const { id } = useParams();
   const movie = MOVIES_DATA.find((m) => m.id === parseInt(id));
 
@@ -39,10 +24,46 @@ export default function Booking() {
 
   // State quản lý lựa chọn
   const [cinema, setCinema] = useState("imax");
-  const [selectedDate, setSelectedDate] = useState("Jan 25"); // Mặc định ngày hôm nay
+  const [selectedDate, setSelectedDate] = useState("Jan 25");
   const [selectedTime, setSelectedTime] = useState("19:30");
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [soldSeats] = useState(["A-1", "A-2", "C-5", "E-10", "F-16"]);
+
+  const handleGoToFood = () => {
+    if (selectedSeats.length === 0) {
+      alert("Vui lòng chọn ghế trước khi chọn đồ ăn!");
+      return;
+    }
+    navigate("/foodCinema", {
+      state: {
+        movieId: id,
+        movieTitle: movie.title,
+        movieImage: movie.image,
+        selectedSeats,
+        selectedDate,
+        selectedTime,
+        seatPrice,
+        totalTicketPrice: selectedSeats.length * seatPrice,
+        cinemaName: cinema,
+      },
+    });
+  };
+
+  const handlePurchase = () => {
+    const totalAmount = selectedSeats.length * seatPrice;
+    navigate("/payment", {
+      state: {
+        movieTitle: movie.title,
+        movieImage: movie.image,
+        movieGenres: movie.genres,
+        date: selectedDate,
+        time: selectedTime,
+        seats: selectedSeats,
+        totalPrice: totalAmount,
+        cinemaName: "Grand Cinema - IMAX",
+      },
+    });
+  };
 
   if (!movie) {
     return (
@@ -86,9 +107,7 @@ export default function Booking() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
-          {/* BỘ LỌC: RẠP - NGÀY - GIỜ */}
           <div className="bg-white/5 p-6 rounded-2xl border border-white/10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Chọn Rạp */}
             <div>
               <label className="flex items-center gap-2 text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                 <MapPin size={12} className="text-blue-500" /> Cinema
@@ -107,16 +126,9 @@ export default function Booking() {
                 <option value="vip" className="bg-[#1a2632]">
                   VIP Lounge - Premium
                 </option>
-                <option value="screenx" className="bg-[#1a2632]">
-                  Starlight - ScreenX
-                </option>
-                <option value="gold" className="bg-[#1a2632]">
-                  Cineplex - Gold Class
-                </option>
               </select>
             </div>
 
-            {/* Chọn Ngày */}
             <div>
               <label className="flex items-center gap-2 text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                 <Calendar size={12} className="text-blue-500" /> Select Date
@@ -132,19 +144,9 @@ export default function Booking() {
                 <option value="Jan 26" className="bg-[#1a2632]">
                   Mon, 26 Jan
                 </option>
-                <option value="Jan 27" className="bg-[#1a2632]">
-                  Tue, 27 Jan
-                </option>
-                <option value="Jan 28" className="bg-[#1a2632]">
-                  Wed, 28 Jan
-                </option>
-                <option value="Jan 29" className="bg-[#1a2632]">
-                  Thu, 29 Jan
-                </option>
               </select>
             </div>
 
-            {/* Chọn Giờ */}
             <div>
               <label className="flex items-center gap-2 text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                 <Clock size={12} className="text-blue-500" /> Select Time
@@ -154,15 +156,6 @@ export default function Booking() {
                 onChange={(e) => setSelectedTime(e.target.value)}
                 className="w-full bg-white/10 border-none rounded-xl h-12 px-4 focus:ring-2 focus:ring-blue-500 appearance-none outline-none cursor-pointer text-sm font-bold"
               >
-                <option value="10:30" className="bg-[#1a2632]">
-                  10:30 AM
-                </option>
-                <option value="13:45" className="bg-[#1a2632]">
-                  13:45 PM
-                </option>
-                <option value="17:00" className="bg-[#1a2632]">
-                  17:00 PM
-                </option>
                 <option value="19:30" className="bg-[#1a2632]">
                   19:30 PM
                 </option>
@@ -173,10 +166,8 @@ export default function Booking() {
             </div>
           </div>
 
-          {/* SƠ ĐỒ GHẾ (Giữ nguyên hiệu ứng Screen phát sáng của bạn) */}
           <div className="bg-white/5 p-8 lg:p-12 rounded-3xl border border-white/10 overflow-x-auto shadow-inner">
             <div className="min-w-[750px]">
-              {/* Screen với hiệu ứng phát sáng */}
               <div className="flex justify-between items-end mb-16 px-6">
                 <div className="flex flex-col items-center gap-1">
                   <DoorOpen
@@ -187,17 +178,14 @@ export default function Booking() {
                     Entrance
                   </span>
                 </div>
-
                 <div className="flex flex-col items-center flex-1">
                   <div className="w-3/4 h-2 bg-blue-400 rounded-full relative shadow-[0_0_40px_10px_rgba(59,130,246,0.7)]">
                     <div className="absolute inset-0 bg-blue-200 rounded-full blur-[2px] opacity-50"></div>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-full h-12 bg-blue-500/10 blur-2xl pointer-events-none"></div>
                   </div>
                   <p className="mt-6 text-white/40 text-xs font-black tracking-[1.5em] uppercase">
                     Screen
                   </p>
                 </div>
-
                 <div className="flex flex-col items-center gap-1">
                   <LogOut
                     size={22}
@@ -247,27 +235,10 @@ export default function Booking() {
                   </div>
                 ))}
               </div>
-
-              {/* Legend */}
-              <div className="mt-16 flex justify-center gap-10 border-t border-white/5 pt-10">
-                {[
-                  { label: "Available", color: "bg-white/30" },
-                  { label: "Selected", color: "bg-blue-600" },
-                  { label: "Sold", color: "bg-white/15 opacity-40" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-3">
-                    <div className={`size-4 rounded ${item.color}`}></div>
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
 
-        {/* TÓM TẮT ĐẶT VÉ (Bên phải) */}
         <div className="lg:col-span-4">
           <div className="sticky top-6 bg-[#1a2632] rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
             <div className="relative h-44 w-full">
@@ -281,7 +252,7 @@ export default function Booking() {
 
             <div className="p-8 -mt-10 relative z-20 space-y-8">
               <div>
-                <h2 className="text-3xl font-black tracking-tight uppercase italic tracking-tighter">
+                <h2 className="text-3xl font-black tracking-tighter uppercase italic">
                   {movie.title}
                 </h2>
                 <div className="flex gap-3 mt-2">
@@ -295,7 +266,6 @@ export default function Booking() {
               </div>
 
               <div className="space-y-5 border-y border-white/5 py-6">
-                {/* Hiển thị Ngày và Giờ đã chọn */}
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-white/40 font-bold uppercase tracking-tighter">
                     Showtime
@@ -314,7 +284,7 @@ export default function Booking() {
                       selectedSeats.map((seat) => (
                         <div
                           key={seat}
-                          className="group bg-blue-600 px-3 py-1.5 rounded-xl flex items-center gap-2"
+                          className="bg-blue-600 px-3 py-1.5 rounded-xl flex items-center gap-2"
                         >
                           <span className="text-xs font-black uppercase">
                             {seat.replace("-", " ")}
@@ -332,6 +302,63 @@ export default function Booking() {
                         No seats selected yet...
                       </p>
                     )}
+                  </div>
+                </div>
+
+                <div className="pt-4 mt-2 border-t border-white/5">
+                  <div className="flex justify-between items-center mb-3">
+                    <div
+                      className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
+                        selectedSeats.length > 0
+                          ? "text-white"
+                          : "text-white/40"
+                      }`}
+                    >
+                      <Utensils
+                        size={14}
+                        className={
+                          selectedSeats.length > 0
+                            ? "text-blue-500"
+                            : "text-white/20"
+                        }
+                      />
+                      Food & Drinks
+                    </div>
+
+                    <button
+                      onClick={handleGoToFood}
+                      disabled={selectedSeats.length === 0}
+                      className={`text-[10px] font-black uppercase transition-all flex items-center gap-1 ${
+                        selectedSeats.length > 0
+                          ? "text-blue-500 hover:text-blue-400 cursor-pointer"
+                          : "text-white/20 cursor-not-allowed"
+                      }`}
+                    >
+                      Add Snacks <ArrowRight size={12} />
+                    </button>
+                  </div>
+
+                  <div
+                    onClick={
+                      selectedSeats.length > 0 ? handleGoToFood : undefined
+                    }
+                    className={`rounded-xl p-4 transition-all group border ${
+                      selectedSeats.length > 0
+                        ? "bg-blue-500/5 border-blue-500/30 cursor-pointer hover:bg-blue-500/10 border-solid shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                        : "bg-white/5 border-dashed border-white/10 cursor-not-allowed"
+                    }`}
+                  >
+                    <p
+                      className={`text-[11px] italic text-center transition-colors ${
+                        selectedSeats.length > 0
+                          ? "text-blue-200 group-hover:text-blue-100 font-medium"
+                          : "text-white/30"
+                      }`}
+                    >
+                      {selectedSeats.length > 0
+                        ? "Seats selected! Click here to add popcorn & drinks "
+                        : "Popcorn & drinks are not selected yet. Click to add!"}
+                    </p>
                   </div>
                 </div>
               </div>
