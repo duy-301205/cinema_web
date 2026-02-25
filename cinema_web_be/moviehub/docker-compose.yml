@@ -1,0 +1,17 @@
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: moviehub_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=dyu301
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=moviehub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:

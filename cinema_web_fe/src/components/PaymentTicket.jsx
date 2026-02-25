@@ -33,20 +33,18 @@ export default function PaymentTicket() {
     );
   }
 
-  // 1. Destructuring dữ liệu từ state
   const {
     movieTitle,
     movieImage,
     date,
     time,
     selectedSeats: seats = [],
-    totalPrice, // Tổng tiền gốc (Vé + Đồ ăn)
+    totalPrice,
     foodItems = [],
-    totalTicketPrice, // Tiền vé từ trang Booking
+    totalTicketPrice,
   } = data;
 
-  // Cấu hình phí và thuế
-  const seatPrice = 16.0; // Đơn giá vé mặc định
+  const seatPrice = 16.0;
   const bookingFee = 2.5;
   const tax = totalPrice * 0.08;
   const finalTotal = totalPrice + bookingFee + tax;
@@ -68,7 +66,6 @@ export default function PaymentTicket() {
 
   return (
     <div className="bg-[#0f172a] min-h-screen flex items-center justify-center p-4 sm:p-8 font-sans antialiased text-slate-200">
-      {/* Background (Giữ nguyên) */}
       <div className="fixed inset-0 z-0 overflow-hidden opacity-20">
         <img
           alt="bg"
@@ -85,7 +82,6 @@ export default function PaymentTicket() {
       </button>
 
       <div className="relative z-10 w-full max-w-[1050px] flex flex-col md:flex-row bg-slate-900/80 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-        {/* LEFT SECTION: GIỮ NGUYÊN GIAO DIỆN CHỌN MOMO/VNPAY/CARD */}
         <div className="flex-1 p-6 lg:p-10 border-b md:border-b-0 md:border-r border-white/10">
           <div className="mb-8">
             <h2 className="text-white text-3xl font-bold mb-2 tracking-tight">
@@ -156,10 +152,9 @@ export default function PaymentTicket() {
             )}
           </button>
 
-          {/* QR Code & Form Card (Giữ nguyên giao diện của bạn) */}
+          {/* HIỂN THỊ QR CODE CHO MOMO/VNPAY */}
           {(paymentMethod === "momo" || paymentMethod === "vnpay") && (
             <div className="bg-slate-950/50 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
-              {/* QR content... */}
               <div className="relative p-4 bg-white rounded-xl mb-6 shadow-xl">
                 <div className="w-44 h-44 bg-slate-100 flex items-center justify-center relative border-4 border-white">
                   <img
@@ -175,6 +170,78 @@ export default function PaymentTicket() {
             </div>
           )}
 
+          {/* HIỂN THỊ FORM NHẬP THẺ NẾU CHỌN CARD (PHẦN ĐÃ KHÔI PHỤC) */}
+          {paymentMethod === "card" && (
+            <div className="space-y-4 animate-in slide-in-from-top-4 duration-500">
+              <div className="grid gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-white/40 ml-1">
+                  Card Number
+                </label>
+                <div className="relative">
+                  <CreditCard
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="0000 0000 0000 0000"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-white/40 ml-1">
+                    Expiry Date
+                  </label>
+                  <div className="relative">
+                    <Calendar
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30"
+                      size={18}
+                    />
+                    <input
+                      type="text"
+                      placeholder="MM / YY"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all"
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-white/40 ml-1">
+                    CVV
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30"
+                      size={18}
+                    />
+                    <input
+                      type="password"
+                      placeholder="***"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-white/40 ml-1">
+                  Cardholder Name
+                </label>
+                <div className="relative">
+                  <User
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="NGUYEN VAN A"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all uppercase"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-8">
             <button
               onClick={handlePayment}
@@ -185,7 +252,6 @@ export default function PaymentTicket() {
           </div>
         </div>
 
-        {/* RIGHT SECTION: BOOKING SUMMARY */}
         <div className="w-full md:w-[380px] bg-black/30 p-6 lg:p-10 flex flex-col">
           <h3 className="text-white text-xl font-bold mb-8">Booking Summary</h3>
           <div className="flex gap-4 mb-8">
@@ -219,7 +285,6 @@ export default function PaymentTicket() {
           </div>
 
           <div className="space-y-4 pt-6 border-t border-white/10">
-            {/* 2. HIỂN THỊ GIÁ VÉ CHI TIẾT */}
             <div className="flex justify-between items-center text-sm">
               <span className="text-white/50 font-medium">
                 Tickets ({seats.length}x)
@@ -229,7 +294,6 @@ export default function PaymentTicket() {
               </span>
             </div>
 
-            {/* HIỂN THỊ ĐỒ ĂN (Nếu có) */}
             {foodItems.length > 0 && (
               <div className="space-y-2 pt-2">
                 <div className="flex items-center gap-2 text-rose-500 font-black text-[10px] uppercase tracking-widest mb-1">

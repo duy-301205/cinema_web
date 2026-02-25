@@ -34,7 +34,7 @@ export const products = [
         sizes: ["S", "M", "L"],
         tag: "Must Try",
         category: "popcorn",
-        img: "https://images.unsplash.com/photo-1599490659223-930b447ffad6?q=80&w=500&auto=format&fit=crop"
+        img: "https://tse3.mm.bing.net/th/id/OIP.gmr3aDplHY4y00bXyvql1gHaHa?pid=Api&P=0&h=220"
     },
     {
         id: 3,
@@ -63,7 +63,7 @@ export const products = [
         sizes: ["Standard"],
         tag: "Popular",
         category: "snacks",
-        img: "https://images.unsplash.com/photo-1541232399669-547014f10006?q=80&w=500&auto=format&fit=crop"
+        img: "https://www.brit.co/media-library/gourmet-hot-dogs.png?id=33770089&width=600&height=600&quality=90&coordinates=0%2C176%2C0%2C164"
     },
     {
         id: 6,
