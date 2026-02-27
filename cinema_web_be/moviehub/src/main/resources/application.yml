@@ -27,3 +27,8 @@ spring:
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
   expiration: 86400000
+
+cloudinary:
+  cloud_name: dxobmvnzz
+  api_key: 842934247774816
+  api_secret: kyMLWk9AKz1MZEVul-vw6LN68c8
