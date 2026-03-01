@@ -1,4 +1,3 @@
-
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- =====================================================
@@ -10,6 +9,7 @@ CREATE TABLE users (
                        email VARCHAR(255) NOT NULL UNIQUE,
                        password VARCHAR(255) NOT NULL,
                        avatar_url TEXT,
+                       avatar_public_id VARCHAR(255),
                        phone VARCHAR(20),
                        role VARCHAR(20) NOT NULL DEFAULT 'CUSTOMER',
                        CONSTRAINT chk_users_role CHECK (role IN ('CUSTOMER', 'ADMIN', 'STAFF')),
@@ -17,7 +17,7 @@ CREATE TABLE users (
                        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Auto update updated_at
+-- Function auto update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -42,6 +42,7 @@ CREATE TABLE movies (
                         actor TEXT,
                         genre VARCHAR(100),
                         poster_url TEXT,
+                        poster_public_id VARCHAR(255),
                         trailer_url TEXT,
                         language VARCHAR(50),
                         rated VARCHAR(10),
@@ -98,6 +99,7 @@ CREATE TABLE seats (
                        row_name VARCHAR(5) NOT NULL,
                        seat_number INT NOT NULL,
                        type VARCHAR(20) NOT NULL DEFAULT 'NORMAL',
+                       extra_price DECIMAL(10,2) DEFAULT 0,
                        CONSTRAINT chk_seats_type CHECK (type IN ('NORMAL', 'VIP', 'COUPLE')),
                        status BOOLEAN NOT NULL DEFAULT TRUE,
                        CONSTRAINT fk_seats_room FOREIGN KEY (room_id)
@@ -114,15 +116,12 @@ CREATE TABLE showtimes (
                            room_id BIGINT NOT NULL,
                            start_time TIMESTAMP NOT NULL,
                            end_time TIMESTAMP NOT NULL,
-                           price DECIMAL(10,2) NOT NULL,
+                           price DECIMAL(10,2) NOT NULL, -- Giá gốc của suất chiếu
                            status BOOLEAN NOT NULL DEFAULT TRUE,
                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
                            CONSTRAINT chk_showtime_time CHECK (end_time > start_time),
-
                            CONSTRAINT fk_showtimes_movie FOREIGN KEY (movie_id)
                                REFERENCES movies(id) ON DELETE CASCADE,
-
                            CONSTRAINT fk_showtimes_room FOREIGN KEY (room_id)
                                REFERENCES rooms(id) ON DELETE CASCADE
 );
@@ -147,7 +146,7 @@ CREATE TABLE bookings (
                           payment_method VARCHAR(50),
                           transaction_id VARCHAR(100),
                           status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-                          CONSTRAINT chk_bookings_status CHECK (status IN ('PENDING', 'SUCCESS', 'CANCELLED')),
+                          CONSTRAINT chk_bookings_status CHECK (status IN ('PENDING', 'SUCCESS', 'CANCELLED', 'EXPIRED')),
                           CONSTRAINT fk_bookings_user FOREIGN KEY (user_id)
                               REFERENCES users(id) ON DELETE CASCADE,
                           CONSTRAINT fk_bookings_showtime FOREIGN KEY (showtime_id)
@@ -162,17 +161,14 @@ CREATE TABLE tickets (
                          booking_id BIGINT NOT NULL,
                          seat_id BIGINT NOT NULL,
                          showtime_id BIGINT NOT NULL,
-                         price DECIMAL(10,2) NOT NULL,
+                         price DECIMAL(10,2) NOT NULL, -- Giá vé thực tế = showtime.price + seat.extra_price
 
                          CONSTRAINT fk_tickets_booking FOREIGN KEY (booking_id)
                              REFERENCES bookings(id) ON DELETE CASCADE,
-
                          CONSTRAINT fk_tickets_seat FOREIGN KEY (seat_id)
                              REFERENCES seats(id),
-
                          CONSTRAINT fk_tickets_showtime FOREIGN KEY (showtime_id)
                              REFERENCES showtimes(id),
-
                          CONSTRAINT uq_ticket_seat_showtime UNIQUE (seat_id, showtime_id)
 );
 

@@ -1,5 +1,6 @@
 package com.dyu.moviehub.dto.request;
 
+import com.dyu.moviehub.enums.MovieStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ public class CreateMovieRequest {
     private String director;
     private String actor;
     private String genre;
+    private String posterPublicId;
     private String posterUrl;
     private String trailerUrl;
     private String language;
@@ -32,5 +34,5 @@ public class CreateMovieRequest {
     @NotNull(message = "Release date not null")
     private LocalDate releaseDate;
 
-    private String status;
+    private MovieStatus status;
 }

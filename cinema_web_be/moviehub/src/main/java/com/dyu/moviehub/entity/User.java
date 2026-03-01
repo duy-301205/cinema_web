@@ -36,6 +36,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "avatar_public_id")
+    private String avatarPublicId;
+
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 

@@ -25,5 +25,8 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     private SeatType seatType;
 
+    @Column(name = "extra_price")
+    private Double extraPrice;
+
     private Boolean status;
 }

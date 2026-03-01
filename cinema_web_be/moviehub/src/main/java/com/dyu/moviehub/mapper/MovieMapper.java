@@ -5,6 +5,7 @@ import com.dyu.moviehub.dto.response.CreateMovieResponse;
 import com.dyu.moviehub.entity.Movie;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface MovieMapper {
@@ -14,4 +15,9 @@ public interface MovieMapper {
     Movie toEntity(CreateMovieRequest request);
 
     CreateMovieResponse toResponse(Movie movie);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntityFromRequest(CreateMovieRequest request, @MappingTarget Movie movie);
 }

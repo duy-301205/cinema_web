@@ -27,12 +27,27 @@ public class CloudinaryService {
 
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
 
+            String publicId = (String) uploadResult.get("public_id");
+            String secureUrl = (String) uploadResult.get("secure_url");
+
+            if (publicId == null || secureUrl == null) {
+                throw new RuntimeException("Cloudinary upload failed");
+            }
+
             return CloudinaryResponse.builder()
-                    .publicId(uploadResult.get("public_id").toString())
-                    .url(uploadResult.get("secure_url").toString())
-                    .status(uploadResult.get("SUCCESS").toString())
+                    .publicId(publicId)
+                    .url(secureUrl)
+                    .status("SUCCESS")
                     .build();
         } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteImage(String public_Id) {
+        try {
+            cloudinary.uploader().destroy(public_Id, ObjectUtils.emptyMap());
+        } catch (IOException | java.io.IOException e) {
             throw new RuntimeException(e);
         }
     }

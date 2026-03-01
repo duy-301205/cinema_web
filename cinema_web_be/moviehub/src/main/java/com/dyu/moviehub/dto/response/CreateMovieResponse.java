@@ -1,5 +1,6 @@
 package com.dyu.moviehub.dto.response;
 
+import com.dyu.moviehub.enums.MovieStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,12 +19,13 @@ public class CreateMovieResponse {
     private String description;
     private String actor;
     private String genre;
+    private String posterPublicId;
     private String posterUrl;
     private String trailerUrl;
     private String language;
     private Integer durationMinutes;
     private LocalDate releaseDate;
-    private String status;
+    private MovieStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -1,5 +1,6 @@
 package com.dyu.moviehub.entity;
 
+import com.dyu.moviehub.enums.MovieStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,6 +30,9 @@ public class Movie {
 
     private String genre;
 
+    @Column(name = "poster_public_id")
+    private String posterPublicId;
+
     @Column(name = "poster_url", columnDefinition = "TEXT")
     private String posterUrl;
 
@@ -44,7 +48,9 @@ public class Movie {
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MovieStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
