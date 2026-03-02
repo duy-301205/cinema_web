@@ -2,44 +2,67 @@ package com.dyu.moviehub.entity;
 
 import com.dyu.moviehub.enums.BookingStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
 
-@Data
 @Entity
 @Table(name = "bookings")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @Column(name = "booking_display_id", unique = true, length = 20)
+    private String bookingDisplayId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "showtime_id", nullable = false)
     private Showtime showtime;
 
-    @Column(name = "total_price", nullable = false)
-    private Double totalPrice;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal subtotal = BigDecimal.ZERO;
 
-    @CreationTimestamp
-    @Column(name = "booking_time")
-    private LocalDateTime bookingTime;
+    @Column(name = "booking_fee", precision = 10, scale = 2)
+    private BigDecimal bookingFee = BigDecimal.valueOf(2.50);
 
-    @Column(name = "payment_method")
+    @Column(name = "service_tax_amount", precision = 10, scale = 2)
+    private BigDecimal serviceTaxAmount = BigDecimal.ZERO;
+
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount;
+
+    @Column(name = "payment_method", length = 50)
     private String paymentMethod;
 
-    @Column(name = "transaction_id")
-    private String transactionId;
-
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    @Column(nullable = false, length = 20)
+    private BookingStatus status = BookingStatus.PENDING;
 
-    // Optional: Có thể thêm List<Ticket> để truy xuất ngược từ Booking ra vé
-    // @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    // private List<Ticket> tickets;
+    @Column(name = "booking_time", nullable = false, columnDefinition = "TIMESTAMPTZ")
+    private ZonedDateTime bookingTime;
+
+    // Quan hệ với vé chi tiết
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets;
+
+    // Quan hệ với đồ ăn đã đặt
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookingSnack> snacks;
 }
