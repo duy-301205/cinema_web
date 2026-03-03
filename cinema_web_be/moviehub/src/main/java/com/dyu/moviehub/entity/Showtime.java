@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -32,14 +31,15 @@ public class Showtime {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
+    @Builder.Default
     @Column(name = "format", nullable = false, length = 20)
-    private String format = "2D"; // VD: IMAX 2D, 3D
+    private String format = "2D";
 
     @Column(name = "start_time", nullable = false)
-    private ZonedDateTime startTime;
+    private OffsetDateTime startTime;
 
     @Column(name = "end_time", nullable = false)
-    private ZonedDateTime endTime;
+    private OffsetDateTime endTime;
 
     @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
@@ -48,10 +48,12 @@ public class Showtime {
     private Boolean status = true;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
-    // Quan hệ với vé đã bán
     @OneToMany(mappedBy = "showtime", fetch = FetchType.LAZY)
     private List<Ticket> tickets;
+
+    @OneToMany(mappedBy = "showtime", fetch = FetchType.LAZY)
+    private List<Booking> bookings;
 }

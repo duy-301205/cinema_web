@@ -8,11 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
 import io.hypersistence.utils.hibernate.type.array.ListArrayType;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -52,6 +53,7 @@ public class Movie {
     @Column(name = "trailer_url", columnDefinition = "TEXT")
     private String trailerUrl;
 
+    @Builder.Default
     @Column(name = "language", length = 50)
     private String language = "English (EN)";
 
@@ -64,15 +66,19 @@ public class Movie {
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
+    @Builder.Default
     @Column(name = "budget", precision = 15, scale = 2)
     private BigDecimal budget = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "revenue", precision = 15, scale = 2)
     private BigDecimal revenue = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "avg_rating", precision = 3, scale = 1)
     private BigDecimal avgRating = BigDecimal.valueOf(0.0);
 
+    @Builder.Default
     @Column(name = "total_reviews")
     private Integer totalReviews = 0;
 
@@ -81,14 +87,12 @@ public class Movie {
     private MovieStatus status = MovieStatus.SHOWING;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime updatedAt;
-
-    // --- RELATIONSHIPS ---
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -98,13 +102,8 @@ public class Movie {
     )
     private List<Director> directors;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "movie_actors",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "actor_id")
-    )
-    private List<Actor> actors;
+    @OneToMany(mappedBy = "movie")
+    private List<MovieActor> movieActors;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

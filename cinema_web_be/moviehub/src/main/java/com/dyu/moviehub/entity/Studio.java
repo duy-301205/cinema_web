@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -33,11 +34,9 @@ public class Studio {
     @Column(name = "country", length = 100)
     private String country;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
-    // Quan hệ nhiều-nhiều với Movie thông qua bảng trung gian movie_studios
     @ManyToMany(mappedBy = "studios", fetch = FetchType.LAZY)
     private List<Movie> movies;
 }

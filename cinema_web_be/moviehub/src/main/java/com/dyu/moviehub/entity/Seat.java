@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "seats", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_seat_position", columnNames = {"room_id", "row_name", "seat_number"})
-})
+@Table(name = "seats")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,13 +31,16 @@ public class Seat {
     @Column(name = "seat_number", nullable = false)
     private Integer seatNumber;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 20)
     private SeatType type = SeatType.NORMAL;
 
+    @Builder.Default
     @Column(name = "extra_price", precision = 10, scale = 2)
     private BigDecimal extraPrice = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "status", nullable = false)
     private Boolean status = true;
 }

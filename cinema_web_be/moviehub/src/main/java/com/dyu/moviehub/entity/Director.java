@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -34,10 +35,9 @@ public class Director {
     private String description;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
-    // Quan hệ nhiều-nhiều với Movie thông qua bảng trung gian movie_directors
     @ManyToMany(mappedBy = "directors", fetch = FetchType.LAZY)
     private List<Movie> movies;
 }

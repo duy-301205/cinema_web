@@ -9,7 +9,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "snacks")
@@ -38,21 +40,25 @@ public class Snack {
     private String imagePublicId;
 
     @Column(length = 50)
-    private String category; // Popcorn, Drinks, v.v.
+    private String category;
 
     @Column(length = 20)
-    private String tag; // BESTSELLER, HOT...
+    private String tag;
 
+    @Builder.Default
     @Column(name = "stock_quantity")
     private Integer stockQuantity = 0;
 
     private Boolean status = true;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMPTZ")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMPTZ")
-    private ZonedDateTime updatedAt;
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
+
+    @OneToMany(mappedBy = "snack", fetch = FetchType.LAZY)
+    private List<BookingSnack> bookingSnacks;
 }

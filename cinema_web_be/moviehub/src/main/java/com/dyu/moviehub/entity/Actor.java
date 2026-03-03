@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -34,8 +34,8 @@ public class Actor {
     private String description;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
     @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
     private List<Movie> movies;

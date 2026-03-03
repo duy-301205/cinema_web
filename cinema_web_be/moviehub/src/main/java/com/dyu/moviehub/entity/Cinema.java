@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -34,15 +35,13 @@ public class Cinema {
     @Column(name = "hotline", length = 20)
     private String hotline;
 
+    @Builder.Default
     @Column(name = "status", nullable = false)
     private Boolean status = true;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
-
-    // Một rạp có nhiều phòng chiếu (Rooms)
     @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Room> rooms;
 }

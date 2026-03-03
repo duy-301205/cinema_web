@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -36,12 +37,15 @@ public class Booking {
     @JoinColumn(name = "showtime_id", nullable = false)
     private Showtime showtime;
 
+    @Builder.Default
     @Column(precision = 10, scale = 2)
     private BigDecimal subtotal = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "booking_fee", precision = 10, scale = 2)
     private BigDecimal bookingFee = BigDecimal.valueOf(2.50);
 
+    @Builder.Default
     @Column(name = "service_tax_amount", precision = 10, scale = 2)
     private BigDecimal serviceTaxAmount = BigDecimal.ZERO;
 
@@ -51,18 +55,17 @@ public class Booking {
     @Column(name = "payment_method", length = 50)
     private String paymentMethod;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private BookingStatus status = BookingStatus.PENDING;
 
-    @Column(name = "booking_time", nullable = false, columnDefinition = "TIMESTAMPTZ")
-    private ZonedDateTime bookingTime;
+    @Column(name = "booking_time", nullable = false)
+    private OffsetDateTime bookingTime;
 
-    // Quan hệ với vé chi tiết
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;
 
-    // Quan hệ với đồ ăn đã đặt
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookingSnack> snacks;
+    @OneToMany(mappedBy = "booking", fetch = FetchType.LAZY)
+    private List<Payment> payments;
 }
