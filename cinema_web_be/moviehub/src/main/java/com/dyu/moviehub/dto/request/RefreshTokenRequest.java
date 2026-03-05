@@ -1,4 +1,4 @@
-package com.dyu.moviehub.dto.response;
+package com.dyu.moviehub.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
-    String token;
-    String message;
+public class RefreshTokenRequest {
+    private String refreshToken;
 }

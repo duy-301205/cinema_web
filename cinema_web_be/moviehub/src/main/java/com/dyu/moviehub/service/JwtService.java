@@ -1,50 +1,66 @@
 package com.dyu.moviehub.service;
 
 import com.dyu.moviehub.entity.User;
+import com.dyu.moviehub.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+
+    private final UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    @Value("${jwt.access-expiration}")
+    private Long accessExpiration;
+
+    @Value("${jwt.refresh-expiration}")
+    private Long refreshExpiration;
 
     // Create token
-    public String generateToken(User user) {
-        Map<String, Object> extraClaims = new HashMap<>();
+    private String buildToken(Map<String, Object> extraClaims, User user, long expirationTime) {
         extraClaims.put("role", user.getRole().name());
-
         return Jwts.builder()
-                .setId(UUID.randomUUID().toString())
                 .setClaims(extraClaims)
-                .setSubject(user.getEmail())
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setId(UUID.randomUUID().toString())
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validateToken(String token, String email) {
-        final String emailFromToken =extractEmail(token);
-        return (email.equals(emailFromToken)) && !validateToken(token);
+    public String generateAccessToken(User user) {
+        return buildToken(new HashMap<>(), user, accessExpiration);
     }
 
-    private boolean validateToken(String token) {
+    public String generateRefreshToken(User user) {
+        return buildToken(new HashMap<>(), user, refreshExpiration);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token, Claims::getExpiration);
+    }
+
+    public boolean validateToken(String token, String email) {
+        final String emailFromToken =extractEmail(token);
+        return (email.equals(emailFromToken)) && !isTokenExpired(token);
+    }
+
+    public boolean isTokenExpired(String token) {
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }
 

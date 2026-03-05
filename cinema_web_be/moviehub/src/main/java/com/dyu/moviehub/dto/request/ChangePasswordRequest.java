@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChangePasswordRequest {
 
-    @NotBlank(message = "Old password not null")
+    @NotBlank(message = "PASSWORD_REQUIRED")
     private String oldPassword;
 
-    @NotBlank(message = "New password not null")
-    @Size(min = 6, message = "New password has less 6 character")
+    @NotBlank(message = "PASSWORD_REQUIRED")
+    @Size(min = 6, message = "PASSWORD_INVALID")
     private String newPassword;
 
-    @NotBlank(message = "Confirm password not null")
+    @NotBlank(message = "PASSWORD_REQUIRED")
     private String confirmPassword;
 }

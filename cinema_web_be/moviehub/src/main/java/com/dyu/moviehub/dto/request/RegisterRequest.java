@@ -11,18 +11,18 @@ import lombok.Data;
 @Builder
 public class RegisterRequest {
 
-    @NotBlank(message = "Name mustn't blank")
+    @NotBlank(message = "FULLNAME_REQUIRED")
     private String fullName;
 
-    @NotBlank(message = "Email mustn't blank")
-    @Email(message = "Email do not validate")
+    @NotBlank(message = "EMAIL_REQUIRED")
+    @Email(message = "INVALID_EMAIL")
     private String email;
 
-    @NotBlank(message = "Password mustn't blank")
-    @Size(min = 6, message = "Password must have more than 6 character")
+    @NotBlank(message = "PASSWORD_REQUIRED")
+    @Size(min = 6, message = "PASSWORD_INVALID")
     private String password;
 
-    @NotBlank(message = "Phone mustn't blank")
-    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be exactly 10 digits")
+    @NotBlank(message = "PHONE_REQUIRED")
+    @Pattern(regexp = "^\\d{10}$", message = "INVALID_PHONE_NUMBER")
     private String phone;
 }

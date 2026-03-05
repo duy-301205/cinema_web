@@ -5,8 +5,11 @@ import com.dyu.moviehub.dto.request.UserUpdateRequest;
 import com.dyu.moviehub.dto.response.UserResponse;
 import com.dyu.moviehub.dto.response.UserUpdateResponse;
 import com.dyu.moviehub.entity.User;
+import com.dyu.moviehub.exception.AppException;
+import com.dyu.moviehub.exception.ErrorCode;
 import com.dyu.moviehub.mapper.UserMapper;
 import com.dyu.moviehub.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,11 +23,12 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserUpdateResponse updateProfile(UserUpdateRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         userMapper.updateUserFromRequest(request, user);
         User updateUser = userRepository.save(user);
@@ -37,23 +41,24 @@ public class UserService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return userMapper.toUserResponse(user);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new RuntimeException("Old password not match");
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
         }
 
         if(!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("New password not match");
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

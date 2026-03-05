@@ -2,9 +2,13 @@ package com.dyu.moviehub.entity;
 
 import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -12,6 +16,9 @@ import java.util.List;
 @Entity
 @Table(name = "reviews")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Review {
 
     @Id
@@ -33,7 +40,7 @@ public class Review {
     @Column(name = "rating_stars", nullable = false)
     private Integer ratingStars;
 
-    @Type(ListArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "highlight_tags", columnDefinition = "varchar(50)[]")
     private List<String> highlightTags;
 

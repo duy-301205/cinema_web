@@ -143,7 +143,7 @@ CREATE TABLE showtimes (
                            status BOOLEAN NOT NULL DEFAULT TRUE,
                            created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
                            CONSTRAINT chk_showtime_time CHECK (end_time > start_time),
-                           CONSTRAINT no_overlapping_showtimes EXCLUDE USING gist (room_id WITH =, tsrange(start_time, end_time) WITH &&)
+                           CONSTRAINT no_overlapping_showtimes EXCLUDE USING gist (room_id WITH =, tstzrange(start_time, end_time) WITH &&)
 );
 
 -- 6. SNACKS
@@ -250,3 +250,11 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_after_review_changes
     AFTER INSERT OR UPDATE OR DELETE ON reviews
     FOR EACH ROW EXECUTE FUNCTION update_movie_rating_stats();
+
+CREATE TABLE invalidated_tokens (
+                                    id TEXT PRIMARY KEY,
+                                    expiry_time TIMESTAMPTZ NOT NULL,
+                                    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_invalidated_tokens_expiry ON invalidated_tokens(expiry_time);

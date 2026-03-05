@@ -1,9 +1,10 @@
 package com.dyu.moviehub.controller;
 
 import com.dyu.moviehub.dto.request.LoginRequest;
+import com.dyu.moviehub.dto.request.RefreshTokenRequest;
 import com.dyu.moviehub.dto.request.RegisterRequest;
 import com.dyu.moviehub.dto.response.ApiResponse;
-import com.dyu.moviehub.dto.response.LoginResponse;
+import com.dyu.moviehub.dto.response.AuthenticationResponse;
 import com.dyu.moviehub.dto.response.RegisterResponse;
 import com.dyu.moviehub.service.AuthService;
 import jakarta.validation.Valid;
@@ -23,15 +24,32 @@ public class AuthController {
     public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return ApiResponse.<RegisterResponse>builder()
                 .data(authService.register(registerRequest))
-                .message("Success")
+                .message("User registered successfully")
                 .build();
     }
 
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ApiResponse.<LoginResponse>builder()
+    public ApiResponse<AuthenticationResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ApiResponse.<AuthenticationResponse>builder()
                 .data(authService.login(request))
-                .message("Success")
+                .message("Login successfully")
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthenticationResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .data(authService.refreshToken(request))
+                .message("Token refreshed successfully")
+                .build();
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        authService.logout(request);
+
+        return ApiResponse.<Void>builder()
+                .message("Logout successfully")
                 .build();
     }
 }

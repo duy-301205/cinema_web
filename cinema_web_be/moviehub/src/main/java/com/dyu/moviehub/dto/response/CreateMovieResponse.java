@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,16 +18,25 @@ import java.time.LocalDateTime;
 public class CreateMovieResponse {
     private Long id;
     private String title;
-    private String description;
-    private String actor;
-    private String genre;
-    private String posterPublicId;
+    private String synopsis;
+
+    private List<String> genre;
+
     private String posterUrl;
+    private String posterPublicId;
+    private String heroImageUrl;
+    private String heroImagePublicId;
     private String trailerUrl;
     private String language;
+    private String rated;
     private Integer durationMinutes;
     private LocalDate releaseDate;
     private MovieStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    private List<String> directors;
+    private List<String> studios;
+    private List<String> actors;
+
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }

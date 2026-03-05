@@ -7,9 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,7 +36,7 @@ public class Movie {
     @Column(name = "synopsis", columnDefinition = "TEXT")
     private String synopsis;
 
-    @Type(ListArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "genre", columnDefinition = "varchar(100)[]")
     private List<String> genre;
 
@@ -102,8 +104,13 @@ public class Movie {
     )
     private List<Director> directors;
 
-    @OneToMany(mappedBy = "movie")
-    private List<MovieActor> movieActors;
+    @ManyToMany
+    @JoinTable(
+            name = "movie_actors",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id")
+    )
+    private List<Actor> actors;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

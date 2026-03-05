@@ -10,11 +10,11 @@ import lombok.Data;
 @Builder
 public class LoginRequest {
 
-    @NotBlank(message = "Email mustn't blank")
-    @Email(message = "Email do not validate")
+    @NotBlank(message = "EMAIL_REQUIRED")
+    @Email(message = "INVALID_EMAIL")
     private String email;
 
-    @NotBlank(message = "Password mustn't blank")
-    @Size(min = 6, message = "Password must have more than 6 character")
+    @NotBlank(message = "PASSWORD_REQUIRED")
+    @Size(min = 6, message = "PASSWORD_INVALID")
     private String password;
 }
