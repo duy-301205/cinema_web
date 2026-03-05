@@ -34,7 +34,10 @@ public enum ErrorCode {
     DURATION_INVALID(3007, "Duration must be at least {value} minutes", HttpStatus.BAD_REQUEST),
     RELEASE_DATE_REQUIRED(3008, "Release date is required", HttpStatus.BAD_REQUEST),
     MOVIE_ALREADY_EXISTS(3009, "Movie already exists", HttpStatus.BAD_REQUEST),
-    MOVIE_NOT_FOUND(3010, "Movie not found", HttpStatus.BAD_REQUEST);
+    MOVIE_NOT_FOUND(3010, "Movie not found", HttpStatus.BAD_REQUEST),
+
+    IMAGES_NOT_FOUND(4001, "Images not found", HttpStatus.BAD_REQUEST);
+
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;

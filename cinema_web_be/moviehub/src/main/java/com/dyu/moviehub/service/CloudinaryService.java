@@ -1,13 +1,18 @@
 package com.dyu.moviehub.service;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.api.ApiResponse;
 import com.cloudinary.utils.ObjectUtils;
 import com.dyu.moviehub.dto.response.CloudinaryResponse;
+import com.dyu.moviehub.dto.response.ImageListResponse;
+import com.dyu.moviehub.exception.AppException;
+import com.dyu.moviehub.exception.ErrorCode;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -41,6 +46,38 @@ public class CloudinaryService {
                     .build();
         } catch (java.io.IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public ImageListResponse getAllImages(String nextCursor) {
+        try {
+            ApiResponse response = cloudinary.api().resources(ObjectUtils.asMap(
+                    "type", "upload",
+                    "prefix", "movie_posters/",
+                    "max_results", 20,
+                    "next_cursor", nextCursor
+            ));
+
+            List<Map> resourses = (List<Map>) response.get("resources");
+
+            if(resourses == null || resourses.isEmpty()) {
+                throw new AppException(ErrorCode.IMAGES_NOT_FOUND);
+            }
+
+            List<CloudinaryResponse> imageList = resourses.stream()
+                    .map(res -> CloudinaryResponse.builder()
+                            .publicId((String) res.get("public_id"))
+                            .url((String) res.get("secure_url"))
+                            .status("SUCCESS")
+                            .build())
+                    .toList();
+
+            return ImageListResponse.builder()
+                    .images(imageList)
+                    .nextCursor((String) response.get("next_cursor"))
+                    .build();
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.IMAGES_NOT_FOUND);
         }
     }
 
