@@ -1,69 +1,95 @@
 package com.dyu.moviehub.service;
 
-import com.cloudinary.Cloudinary;
-import com.dyu.moviehub.dto.request.CreateMovieRequest;
-import com.dyu.moviehub.dto.response.CreateMovieResponse;
+import com.dyu.moviehub.dto.request.TMDBMovieDto;
+import com.dyu.moviehub.dto.response.TMDBResponse;
 import com.dyu.moviehub.entity.Movie;
-import com.dyu.moviehub.exception.AppException;
-import com.dyu.moviehub.exception.ErrorCode;
-import com.dyu.moviehub.mapper.MovieMapper;
+import com.dyu.moviehub.repository.ActorRepository;
 import com.dyu.moviehub.repository.DirectorRepository;
 import com.dyu.moviehub.repository.MovieRepository;
 import com.dyu.moviehub.repository.StudioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 public class MovieService {
-
     private final MovieRepository movieRepository;
-    private final MovieMapper movieMapper;
-    private final CloudinaryService cloudinaryService;
+    private final ActorRepository actorRepository;
     private final DirectorRepository directorRepository;
     private final StudioRepository studioRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${tmdb.api.key}")
+    private String apiKey;
+
+    @Value("${tmdb.base.url}")
+    private String baseUrl;
+
+    @Value("${tmdb.image.url}")
+    private String imageUrl;
 
     @Transactional
-    public CreateMovieResponse createMovie(CreateMovieRequest request) {
-        if (movieRepository.existsByTitle(request.getTitle())) {
-            throw new AppException(ErrorCode.MOVIE_ALREADY_EXISTS);
-        }
-        Movie movie = movieMapper.toEntity(request);
+    public List<Movie> importMovies(String query) {
+        Map<Integer, String> genreMap = fetchGenreMap();
+        String url = baseUrl + "/search/movie?api_key=" + apiKey + "&query=" + query + "&language=vi-VN";
+        TMDBResponse searchResp = restTemplate.getForObject(url, TMDBResponse.class);
 
-        if(request.getDirectorIds() != null && !request.getDirectorIds().isEmpty()) {
-            var directors = directorRepository.findAllById(request.getDirectorIds());
-            movie.setDirectors(directors);
+        if(searchResp == null || searchResp.getResults() == null) return List.of();
+
+        List<CompletableFuture<Movie>> futures = new ArrayList<>();
+
+        for(TMDBMovieDto movieDto : searchResp.getResults()) {
+            if(movieRepository.existsByExternalId(movieDto.getId())) {
+                continue;
+            }
+
+            CompletableFuture<Movie> future = processSingleMovieAsync(movieDto, genreMap);
+
+            futures.add(future);
         }
 
-        if (request.getStudioIds() != null && !request.getStudioIds().isEmpty()) {
-            var studios = studioRepository.findAllById(request.getStudioIds());
-            movie.setStudios(studios);
-        }
+        List<Movie> movies = new ArrayList<>();
 
-        return movieMapper.toResponse(movieRepository.save(movie));
+        for(CompletableFuture<Movie> movieFuture : futures) {
+            Movie movie = movieFuture.join();
+            movies.add(movieRepository.save(movie));
+        }
+        return movies;
     }
 
-    @Transactional
-    public CreateMovieResponse uploadMovie(Long id, CreateMovieRequest request) {
-        Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_FOUND));
+    @Async("tmdbExecutor")
+    public CompletableFuture<Movie> processSingleMovieAsync(TMDBMovieDto dto, Map<Integer, String> genreMap) {
+        String detailUrl = baseUrl + "/movie/" + dto.getId() + "?api_key=" + apiKey;
+        String creditUrl = baseUrl + "/movie/" + dto.getId() + "/credits?api_key=" + apiKey;
 
-        if(request.getPosterPublicId() != null && movie.getPosterPublicId() != null &&
-                !movie.getPosterPublicId().equals(request.getPosterPublicId())) {
-            cloudinaryService.deleteImage(movie.getPosterPublicId());
+
+    }
+
+    private Map<Integer, String> fetchGenreMap() {
+        String url = baseUrl + "/genre/movie/list?api_key=" + apiKey + "&language=vi-VN";
+
+        Map<String, Object> resp = restTemplate.getForObject(url, Map.class);
+
+        List<Map<String, Object>> genreList = (List<Map<String, Object>>) resp.get("genre");
+
+        Map<Integer, String> genreMap = new HashMap<>();
+
+        for(Map<String, Object> genre : genreList) {
+            Integer id = (Integer) genre.get("id");
+            String genreName = (String) genre.get("name");
+            genreMap.put(id, genreName);
         }
 
-        movieMapper.updateEntityFromRequest(request, movie);
-
-        if (request.getDirectorIds() != null) {
-            movie.setDirectors(directorRepository.findAllById(request.getDirectorIds()));
-        }
-
-        if (request.getStudioIds() != null) {
-            movie.setStudios(studioRepository.findAllById(request.getStudioIds()));
-        }
-
-        return movieMapper.toResponse(movieRepository.save(movie));
+        return genreMap;
     }
 }

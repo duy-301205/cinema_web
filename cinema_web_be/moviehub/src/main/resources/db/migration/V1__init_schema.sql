@@ -56,6 +56,7 @@ CREATE TABLE studios (
 -- 3. MOVIES (Đã đổi sang TIMESTAMPTZ)
 CREATE TABLE movies (
                         id BIGSERIAL PRIMARY KEY,
+                        external_id BIGINT UNIQUE,
                         title VARCHAR(255) NOT NULL,
                         synopsis TEXT,
                         genre VARCHAR(100)[],

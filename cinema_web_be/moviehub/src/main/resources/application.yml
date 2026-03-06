@@ -38,3 +38,11 @@ cloudinary:
   cloud_name: dxobmvnzz
   api_key: 842934247774816
   api_secret: kyMLWk9AKz1MZEVul-vw6LN68c8
+
+tmdb:
+  api:
+    key: dbe35e8e2d73c8f03d627e28a585dd72
+  base:
+    url: https://api.themoviedb.org/3
+  image:
+    url: https://image.tmdb.org/t/p/original

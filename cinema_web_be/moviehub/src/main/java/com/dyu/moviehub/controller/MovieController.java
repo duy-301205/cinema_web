@@ -15,17 +15,5 @@ public class MovieController {
 
     private final MovieService movieService;
 
-    @PostMapping("/post")
-    public ApiResponse<CreateMovieResponse> createMovie(@Valid  @RequestBody CreateMovieRequest request) {
-        return ApiResponse.<CreateMovieResponse>builder()
-                .data(movieService.createMovie(request))
-                .build();
-    }
 
-    @PutMapping("/update/{id}")
-    public ApiResponse<CreateMovieResponse> updateMovie(@PathVariable Long id, @Valid @RequestBody CreateMovieRequest request) {
-        return ApiResponse.<CreateMovieResponse>builder()
-                .data(movieService.uploadMovie(id, request))
-                .build();
-    }
 }

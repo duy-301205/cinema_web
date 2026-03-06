@@ -1,10 +1,9 @@
 package com.dyu.moviehub.repository;
 
-import com.dyu.moviehub.entity.Movie;
+import com.dyu.moviehub.entity.Actor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie, Long> {
-    boolean existsByExternalId(Long externalId);
+public interface ActorRepository extends JpaRepository<Actor, Long> {
 }
