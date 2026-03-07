@@ -60,10 +60,6 @@ public class MovieService {
 
         for(TMDBMovieDto movieDto : searchResp.getResults()) {
 
-            if (!movieDto.getTitle().equalsIgnoreCase(query)) {
-                continue;
-            }
-
             if(movieRepository.existsByExternalId(movieDto.getId())) {
                 continue;
             }
@@ -115,17 +111,32 @@ public class MovieService {
         return CompletableFuture.allOf(detailFutute, creditsFuture, trailerFuture).thenApply(v -> {
 
             TMDBMovieDto detailData = detailFutute.join();
-            TMDBCreditsResponse creditsData = creditsFuture.join();
-            String trailerUrl = trailerFuture.join();
 
-            String finalSynopsis = (detailData.getSynopsis() == null || detailData.getSynopsis().isEmpty())
-                    ? searchDto.getSynopsis() : detailData.getSynopsis();
+            String finalSynopsis = detailData.getSynopsis();
+            if (finalSynopsis == null || finalSynopsis.trim().isEmpty()) {
+                String detailUrlEn = baseUrl + "/movie/" + searchDto.getId() + "?api_key=" + apiKey + "&language=en-US";
+                try {
+                    TMDBMovieDto detailDataEn = restTemplate.getForObject(detailUrlEn, TMDBMovieDto.class);
+                    if (detailDataEn != null) {
+                        finalSynopsis = detailDataEn.getSynopsis();
+                    }
+                } catch (Exception e) {
+                    log.error("Không thể lấy synopsis tiếng Anh cho phim {}", searchDto.getId());
+                }
+            }
+
+            if (finalSynopsis == null || finalSynopsis.trim().isEmpty()) {
+                finalSynopsis = searchDto.getSynopsis();
+            }
 
             // Ưu tiên ngày từ Detail, nếu không có lấy từ Search
             String rawDate = (detailData.getReleaseDate() != null && !detailData.getReleaseDate().isEmpty())
                     ? detailData.getReleaseDate()
                     : searchDto.getReleaseDate();
             LocalDate reseaseDate = safeParseDate(rawDate);
+
+            TMDBCreditsResponse creditsData = creditsFuture.join();
+            String trailerUrl = trailerFuture.join();
 
             // Xu li dien vien
             List<Actor> actors = mapActors(creditsData.getCast());
