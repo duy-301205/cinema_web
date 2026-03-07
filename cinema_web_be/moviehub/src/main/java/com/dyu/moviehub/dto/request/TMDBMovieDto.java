@@ -50,3 +50,5 @@ public class TMDBMovieDto {
 
     @Data public static class NamedDto { private String name; }
 }
+
+
